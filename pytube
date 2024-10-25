@@ -1,0 +1,21 @@
+import boto3
+from pytube import YouTube
+import os
+
+s3 = boto3.client('s3')
+
+def lambda_handler(event, context):
+    video_url = event['queryStringParameters']['url']
+    yt = YouTube(video_url)
+    video_stream = yt.streams.get_highest_resolution()
+
+    video_stream.download('/tmp/')
+    file_name = yt.title + ".mp4"
+
+    # Upload to S3
+    s3.upload_file('/tmp/' + file_name, 'youtube', file_name)
+
+    return {
+        'statusCode': 200,
+        'body': 'Video downloaded and uploaded to S3!'
+    }

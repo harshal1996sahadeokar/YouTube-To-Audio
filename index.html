@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube to MP3 Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        input {
+            padding: 10px;
+            width: 80%;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>YouTube to MP3 Converter</h1>
+        <input type="text" id="youtube-url" placeholder="Enter YouTube Video URL" />
+        <br />
+        <button onclick="convertToMp3()">Convert to MP3</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        async function convertToMp3() {
+            const url = document.getElementById('youtube-url').value;
+            if (!url) {
+                alert('Please enter a YouTube video URL!');
+                return;
+            }
+
+            document.getElementById('status').innerText = 'Converting...';
+
+            try {
+                const response = await fetch('/convert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Conversion failed!');
+                }
+
+                const blob = await response.blob();
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'audio.mp3';
+                link.click();
+
+                document.getElementById('status').innerText = 'Conversion successful!';
+            } catch (error) {
+                document.getElementById('status').innerText = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

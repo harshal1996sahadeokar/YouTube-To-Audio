@@ -1,0 +1,22 @@
+import boto3
+import os
+import subprocess
+
+s3 = boto3.client('s3')
+
+def lambda_handler(event, context):
+    bucket = event['Records'][0]['s3']['bucket']['name']
+    key = event['Records'][0]['s3']['object']['key']
+
+    # Download video from S3
+    download_path = '/tmp/{}'.format(key)
+    s3.download_file(bucket, key, download_path)
+
+    # Convert video to audio using FFmpeg
+    audio_file = download_path.replace('.mp4', '.mp3')
+    subprocess.run(['ffmpeg', '-i', download_path, audio_file])
+
+    # Upload audio file back to S3
+    s3.upload_file(audio_file, bucket, audio_file)
+
+    return 'Audio conversion complete!'

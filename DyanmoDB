@@ -1,0 +1,10 @@
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('s3')
+
+table.put_item(
+    Item={
+        'user_id': 'user123',
+        'video_url': 'youtube_url',
+        'status': 'processing'
+    }
+)
